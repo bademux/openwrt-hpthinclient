@@ -2,7 +2,7 @@
 #build: DOCKER_BUILDKIT=1 docker build --progress=plain --output ./ .
 #flash: gzip -c openwrt-*-squashfs-combined-efi.img.gz | dd of=/dev/sdX bs=16M status=progress oflag=direct conv=fsync
 ARG OPENWRT_VER=25.12.0-rc2
-FROM openwrt/imagebuilder:x86-64-${OPENWRT_VER} as builder
+FROM openwrt/imagebuilder:x86-64-${OPENWRT_VER} AS builder
 COPY <<PACKAGES_EOF packages.txt
 apk-mbedtls base-files ca-bundle dnsmasq dropbear e2fsprogs firewall4 fstools grub2-bios-setup
 kmod-nft-offload libc libgcc libustream-mbedtls logd mkf2fs mtd netifd nftables odhcp6c odhcpd-ipv6only partx-utils
