@@ -1,0 +1,39 @@
+name: ci
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  buildAndRelease:
+    permissions:
+      contents: write 
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build and export Docker artifact
+        id: docker_build
+        env:
+         DOCKER_BUILDKIT: 1
+         BUILDKIT_PROGRESS: plain
+        run: docker build --build-arg OPENWRT_VER="${GITHUB_REF_NAME#v}" --output type=local,dest=artifacts .
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-artifacts
+          path: artifacts/
+      - name: Create Release and Upload Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**
+          generate_release_notes: false
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
